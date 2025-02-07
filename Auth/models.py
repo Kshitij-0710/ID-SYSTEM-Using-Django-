@@ -33,7 +33,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser,PermissionsMixin):
     user_id = models.CharField(max_length=5,unique=True)
     name = models.CharField(max_length=255)
-    email = models.EmailField(default=True)
+    email = models.EmailField(default=True ,unique= True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     objects = CustomUserManager()
