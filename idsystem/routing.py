@@ -1,5 +1,6 @@
-from django.db import router
 from rest_framework.routers import DefaultRouter
-routing = DefaultRouter()
+from Auth.views import CustomUserViewSet
 
-router.register(r'auth',AuthViewset,basename = 'auth')
+router = DefaultRouter() 
+
+router.register(r'auth', CustomUserViewSet, basename='auth')
