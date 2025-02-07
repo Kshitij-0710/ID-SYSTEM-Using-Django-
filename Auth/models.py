@@ -30,7 +30,18 @@ class CustomUserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self.db)
         return user
+class CustomUser(AbstractBaseUser,PermissionsMixin):
+    user_id = models.CharField(max_length=5,unique=True)
+    name = models.CharField(max_length=255)
+    email = models.EmailField(default=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    objects = CustomUserManager()
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
+    def __str__(self):
+        return f"{self.name} ({self.user_id})"
     
 
 
