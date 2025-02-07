@@ -5,7 +5,7 @@ import random
 import string
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self , email,name,passsword=None):
+    def create_user(self , email,name,password=None,is_paid=False):
         if not email:
             raise ValueError("user must have an email")
         while True :
@@ -15,9 +15,10 @@ class CustomUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             name=name,
-            user_id=user_id
+            user_id=user_id,
+            is_paid = is_paid
         )
-        user.set_password(passsword)
+        user.set_password(password)
         user.save(using=self.db)
         return user
     def create_superuser(self,email,name,password):
@@ -25,6 +26,7 @@ class CustomUserManager(BaseUserManager):
             email=email,
             name=name,
             password=password,
+            is_paid = True
         )
         user.is_staff =True
         user.is_superuser = True
@@ -33,6 +35,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser,PermissionsMixin):
     user_id = models.CharField(max_length=5,unique=True)
     name = models.CharField(max_length=255)
+    is_paid = models.BooleanField(default=False)
     email = models.EmailField(default=True ,unique= True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -43,5 +46,3 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     def __str__(self):
         return f"{self.name} ({self.user_id})"
     
-
-
