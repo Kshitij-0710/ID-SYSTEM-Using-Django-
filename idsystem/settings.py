@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-AUTH_USER_MODEL = 'auth_app.CustomUser'
+AUTH_USER_MODEL = 'Auth.CustomUser'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
