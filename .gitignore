@@ -298,5 +298,3 @@ static/rest_framework
 static/jet
 static/range_filter
 
-# opmaint_firebase.json
-*.pyc
