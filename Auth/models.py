@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from django.contrib.auth.models import AbstractBaseUser , BaseUserManager, PermissionsMixin
 import random
+from django_lifecycle import hook , AFTER_CREATE , AFTER_UPDATE
 import string
 
 class CustomUserManager(BaseUserManager):
@@ -45,4 +46,12 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     REQUIRED_FIELDS = ['name']
     def __str__(self):
         return f"{self.name} ({self.user_id})"
+    @hook(AFTER_UPDATE, when='is_paid', was=False, is_now=True)
+    def on_payment_success(self):
+        """
+        Trigger actions when a user's payment status changes to paid
+        Example: Send confirmation email, grant access, etc.
+        """
+        # Add your payment success logic here
+        pass
     
