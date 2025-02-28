@@ -6,11 +6,40 @@ from django.contrib.auth import get_user_model, authenticate
 from .serializers import UserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
-from django.shortcuts import render
 from django.http import HttpResponse
-from django.template.loader import get_template
-from weasyprint import HTML
+from reportlab.lib.pagesizes import credit_card
+from reportlab.pdfgen import canvas
 from .models import CustomUser
+
+def generate_id_card(request, user_id):
+    try:
+        user = CustomUser.objects.get(user_id=user_id)
+    except CustomUser.DoesNotExist:
+        return HttpResponse("User not found", status=404)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'filename={user.user_id}_id_card.pdf'
+
+    p = canvas.Canvas(response, pagesize=credit_card)
+    width, height = credit_card
+
+    # Draw ID Card Content
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(20, height - 30, "User ID Card")
+
+    p.setFont("Helvetica", 12)
+    p.drawString(20, height - 60, f"Name: {user.name}")
+    p.drawString(20, height - 90, f"Email: {user.email}")
+    p.drawString(20, height - 120, f"Unique ID: {user.user_id}")
+    
+    status_text = "Paid" if user.is_paid else "Not Paid"
+    p.setFillColorRGB(0, 1, 0) if user.is_paid else p.setFillColorRGB(1, 0, 0)
+    p.drawString(20, height - 150, f"Status: {status_text}")
+
+    p.showPage()
+    p.save()
+    return response
+
 
 User = get_user_model()
 
@@ -67,16 +96,3 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                 'error': 'Invalid credentials'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-def generate_id_card(request, user_id):
-    try:
-        user = CustomUser.objects.get(user_id=user_id)
-    except CustomUser.DoesNotExist:
-        return HttpResponse("User not found", status=404)
-    
-    template = get_template('id_card.html')
-    html_content = template.render({'user': user})
-    pdf_file = HTML(string=html_content).write_pdf()
-    
-    response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = f'filename={user.user_id}_id_card.pdf'
-    return response
