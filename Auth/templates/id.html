@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Card</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            width: 300px;
+            border: 2px solid #000;
+            padding: 20px;
+            text-align: center;
+        }
+        .header {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .status {
+            font-weight: bold;
+            color: {% if user.is_paid %}green{% else %}red{% endif %};
+        }
+    </style>
+</head>
+<body>
+    <div class="header">User ID Card</div>
+    <p><strong>Name:</strong> {{ user.name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Unique ID:</strong> {{ user.user_id }}</p>
+    <p class="status"><strong>Status:</strong> {{ "Paid" if user.is_paid else "Not Paid" }}</p>
+</body>
+</html>
