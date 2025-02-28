@@ -85,6 +85,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'idsystem.wsgi.application'
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False  # Only if using fetch/XHR for CSRF
 
 
 # Database
