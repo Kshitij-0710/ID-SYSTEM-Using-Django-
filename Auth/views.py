@@ -7,8 +7,12 @@ from .serializers import UserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from django.http import HttpResponse
-from reportlab.lib.pagesizes import credit_card
 from reportlab.pdfgen import canvas
+from .models import CustomUser
+
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
 from .models import CustomUser
 
 def generate_id_card(request, user_id):
@@ -17,28 +21,30 @@ def generate_id_card(request, user_id):
     except CustomUser.DoesNotExist:
         return HttpResponse("User not found", status=404)
 
+    width = 3.375 * inch  
+    height = 2.125 * inch 
+
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'filename={user.user_id}_id_card.pdf'
+    response['Content-Disposition'] = f'attachment; filename={user.user_id}_id_card.pdf'
 
-    p = canvas.Canvas(response, pagesize=credit_card)
-    width, height = credit_card
+    p = canvas.Canvas(response, pagesize=(width, height))
 
-    # Draw ID Card Content
     p.setFont("Helvetica-Bold", 14)
-    p.drawString(20, height - 30, "User ID Card")
+    p.drawString(10, height - 30, "User ID Card")
 
-    p.setFont("Helvetica", 12)
-    p.drawString(20, height - 60, f"Name: {user.name}")
-    p.drawString(20, height - 90, f"Email: {user.email}")
-    p.drawString(20, height - 120, f"Unique ID: {user.user_id}")
-    
+    p.setFont("Helvetica", 10)
+    p.drawString(10, height - 50, f"Name: {user.name}")
+    p.drawString(10, height - 65, f"Email: {user.email}")
+    p.drawString(10, height - 80, f"Unique ID: {user.user_id}")
+
     status_text = "Paid" if user.is_paid else "Not Paid"
     p.setFillColorRGB(0, 1, 0) if user.is_paid else p.setFillColorRGB(1, 0, 0)
-    p.drawString(20, height - 150, f"Status: {status_text}")
+    p.drawString(10, height - 95, f"Status: {status_text}")
 
     p.showPage()
     p.save()
     return response
+
 
 
 User = get_user_model()
@@ -61,7 +67,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             user = User.objects.create_user(
                 email=serializer.validated_data['email'],
                 name=serializer.validated_data['name'],
-                passsword=serializer.validated_data['password']
+                password=serializer.validated_data['password']
             )
             token,created = Token.objects.get_or_create(user=user)
             return Response({
