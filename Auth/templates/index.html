@@ -121,7 +121,7 @@
             localStorage.setItem('token', data.token);
             
             // Access the user_id from the nested user object
-            if (data.user && data.user.user_id) {
+            if (data.user && data.user.user_id) {  
               localStorage.setItem('user_id', data.user.user_id);
               console.log('Redirecting to:', `/id-card/${data.user.user_id}/`);
               window.location.href = `/id-card/${data.user.user_id}/`;
